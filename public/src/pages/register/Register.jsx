@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {ToastContainer, toast} from 'react-toastify'
+import { ToastContainer, toast } from 'react-toastify'
 import axios from 'axios';
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -22,24 +22,30 @@ function Register() {
 		draggable: true,
 		theme: 'dark',
 	};
+	useEffect(() => {
+		if (localStorage.getItem('chat-app-user')) {
+			navigate('/');
+		}
+	}, [])
 	const navigate = useNavigate();
-	
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		if(handleValidation()) {
-			console.log('in validation step', registerRoute);
-			const {username, email, password, confirmPwd} = values;
-			const {data} = await axios.post(registerRoute, {
+		if (handleValidation()) {
+			const { username, email, password } = values;
+			const { data } = await axios.post(registerRoute, {
 				username,
 				email,
 				password,
 			});
-			if(data.status === false) {
+			if (data.status === false) {
 				toast.error(data.msg, toastOptions);
 			}
-			if(data.status === true) {
-				
+			if (data.status === true) {
+				localStorage.setItem('chat-app-user', JSON.stringify(data.user));
+				navigate('/');
 			}
+
 		}
 	}
 	const handleChange = (e) => {
@@ -51,8 +57,8 @@ function Register() {
 	}
 
 	const handleValidation = () => {
-		const {username, email, password, confirmPwd} = values;
-		if(password !== confirmPwd) {
+		const { username, email, password, confirmPwd } = values;
+		if (password !== confirmPwd) {
 			toast.error('Password and Confirm Password should be same.', toastOptions);
 			return false;
 		} else if (username.length < 3) {
