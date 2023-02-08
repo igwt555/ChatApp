@@ -33,7 +33,13 @@ function Register() {
 				username,
 				email,
 				password,
-			})
+			});
+			if(data.status === false) {
+				toast.error(data.msg, toastOptions);
+			}
+			if(data.status === true) {
+				
+			}
 		}
 	}
 	const handleChange = (e) => {
