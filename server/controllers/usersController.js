@@ -16,8 +16,8 @@ module.exports.register = async (req, res, next) => {
         });
         delete user.password;
         return res.json({ status: true, user });
-    } catch (err) {
-        next(err);
+    } catch (ex) {
+        next(ex);
     }
 };
 
@@ -27,10 +27,27 @@ module.exports.login = async (req, res, next) => {
         const user = await User.findOne({ username });
         if (!user) return res.json({ msg: 'Incorrect username or password', status: false });
         const isPwdValid = await bcrypt.compare(password, user.password);
-        if(!isPwdValid) return res.json({ msg: 'Incorrect username or password', status: false });
+        if (!isPwdValid) return res.json({ msg: 'Incorrect username or password', status: false });
         delete user.password;
         return res.json({ status: true, user });
-    } catch (err) {
-        next(err);
+    } catch (ex) {
+        next(ex);
     }
 };
+
+module.exports.setAvatar = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        const avatarImage = req.body.image;
+        const userData = await User.findByIdAndUpdate(userId, {
+            isAvatarImageSet: true,
+            avatarImage,
+        });
+        return res.json({
+            isSet: userData.isAvatarImageSet,
+            image: userData.avatarImage,
+        });
+    } catch (ex) {
+        next(ex);
+    }
+}
