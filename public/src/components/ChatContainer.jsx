@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getMessagesRoute, sendMessageRoute } from '../utils/APIRoutes';
+import { getMessagesRoute, sendMessageRoute, addChatUser } from '../utils/APIRoutes';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 import './ChatContainerStyle.scss';
 import ChatInput from './ChatInput';
 import Logout from './Logout';
@@ -34,10 +35,24 @@ export default function ChatContainer({ currentChat, currentUser, socket }) {
         });
 
         const msgs = [...messages];
-        msg.push({ fromSelf: true, message: msg });
+        msgs.push({ fromSelf: true, message: msg });
         setMessages(msgs);
     };
 
+    const handleAddUser = async () => {
+        const { data } = await axios.post(addChatUser, {
+            currentUser: currentUser.username,
+            addUser: currentChat.username,
+        });
+        if (data.status === false) {
+            alert("Failed to Add a new User");
+        }
+        if (data.status === true && data.notNew) {
+            alert("Already Exists on your Contact list");
+        } else {
+            alert('Added successfully');
+        }
+    }
     useEffect(() => {
         if (socket.current) {
             socket.current.on('msg-recieve', (msg) => {
@@ -68,13 +83,17 @@ export default function ChatContainer({ currentChat, currentUser, socket }) {
                             <h3>{currentChat.username}</h3>
                         </div>
                     </div>
-                    <Logout />
+                    <div className='btn-pack'>
+                        <button className='add-user-btn' onClick={handleAddUser}>Add</button>
+                        <Logout />
+                    </div>
+
                 </div>
                 <div className="chat-messages">
                     {
                         messages.map((message) => {
                             return (
-                                <div>
+                                <div ref={scrollRef} key={uuidv4}>
                                     <div className={`message ${message.fromSelf ? 'sended' : 'received'}`}>
                                         <div className="msg-content">
                                             <p>

@@ -6,6 +6,7 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
     const [currentUserName, setCurrentUserName] = useState(undefined);
     const [currentUserImage, setCurrentUserImage] = useState(undefined);
     const [currentSelected, setCurrentSelected] = useState(undefined);
+    const [searchName, setSearchName] = useState('');
     useEffect(() => {
         if (currentUser) {
             setCurrentUserImage(currentUser.avatarImage);
@@ -17,6 +18,16 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
         setCurrentSelected(index);
         changeChat(contact);
     }
+
+    const handleSearch = () => {
+        if(!searchName) {
+            alert('Please input usernmae to search');
+        }
+        else {
+            alert(searchName);
+        }
+    }
+
     return (
         <>
             {
@@ -26,6 +37,17 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
                             <img src={Logo} alt='logo' />
                             <h3>snappy</h3>
                         </div>
+                        <div className="search-user">
+                            <input
+                                type='text'
+                                placeholder='Search user'
+                                value={searchName}
+                                onChange={(e) => setSearchName(e.target.value)}
+                            />
+                            <button className="search-btn" onClick={handleSearch}>
+                                Search
+                            </button>
+                        </div>
                         <div className='contacts'>
                             {
                                 contacts.map((contact, index) => {
@@ -34,7 +56,7 @@ export default function Contacts({ contacts, currentUser, changeChat }) {
                                             className={`contact ${index === currentSelected ? 'selected' : ''
                                                 }`}
                                             key={index}
-                                            onClick={()=> changeCurrentChat(index, contact)}
+                                            onClick={() => changeCurrentChat(index, contact)}
                                         >
                                             <div className='avatar'>
                                                 <img

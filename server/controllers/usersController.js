@@ -54,13 +54,35 @@ module.exports.setAvatar = async (req, res, next) => {
 
 module.exports.getAllUsers = async (req, res, next) => {
     try {
-        const users = await User.find({_id:{$ne: req.params.id}}).select([
-            'email', 
+        const users = await User.find({ _id: { $ne: req.params.id } }).select([
+            'email',
             'username',
             'avatarImage',
             '_id',
         ]);
         return res.json(users);
+    } catch (ex) {
+        next(ex);
+    }
+}
+
+module.exports.addChatUser = async (req, res, next) => {
+    try {
+        if (User.find({ chatUserList: { $elemMatch: { $eq: req.body.addUser } } })) {
+            return res.json({status: true, notNew: true});
+        }
+        User.updateOne(
+            { username: req.body.currentUser },
+            { $addToSet: { chatUserList: [req.body.addUser] } },
+            (error) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Adding User successful!');
+                }
+            }
+        )
+        return res.json({ status: true });
     } catch (ex) {
         next(ex);
     }

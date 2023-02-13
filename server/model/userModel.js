@@ -26,7 +26,11 @@ const userSchema = new mongoose.Schema({
     avatarImage: {
         type: String,
         default: '',
-    }
+    },
+    chatUserList: {
+        type: Array,
+        default: [],
+    },
 });
 
 module.exports = mongoose.model('Users', userSchema);
